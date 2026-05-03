@@ -1,0 +1,247 @@
+// Prisma Schema for NeuroLearn AI
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+  PDF
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         Role           @default(STUDENT)
+  avatar       String?
+  xp           Int            @default(0)
+  level        Int            @default(1)
+  streak       Int            @default(0)
+  lastActiveAt DateTime?
+  isPremium    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  enrollments  Enrollment[]
+  progress     UserProgress[]
+  quizResults  QuizResult[]
+  studyPlans   StudyPlan[]
+  achievements Achievement[]
+  chatSessions ChatSession[]
+  weakAreas    WeakArea[]
+
+  @@index([email])
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  thumbnail   String?
+  difficulty  Difficulty @default(EASY)
+  category    String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules     Module[]
+  enrollments Enrollment[]
+
+  @@index([category])
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId  String
+  title    String
+  order    Int
+
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  @@index([courseId])
+}
+
+model Lesson {
+  id       String     @id @default(cuid())
+  moduleId String
+  title    String
+  content  String
+  type     LessonType @default(VIDEO)
+  videoUrl String?
+  recommendedVideos Json?
+  order    Int
+
+  module   Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  quizzes  Quiz[]
+  progress UserProgress[]
+
+  @@index([moduleId])
+}
+
+model Quiz {
+  id         String     @id @default(cuid())
+  lessonId   String
+  title      String
+  timeLimit  Int        @default(300) // seconds
+  difficulty Difficulty @default(MEDIUM)
+
+  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+  results   QuizResult[]
+
+  @@index([lessonId])
+}
+
+model Question {
+  id            String     @id @default(cuid())
+  quizId        String
+  questionText  String
+  options       Json       // ["option1", "option2", "option3", "option4"]
+  correctAnswer Int        // index of correct option
+  difficulty    Difficulty @default(MEDIUM)
+  explanation   String?
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId    String
+  enrolledAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model UserProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  timeSpent   Int       @default(0) // seconds
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+model QuizResult {
+  id        String   @id @default(cuid())
+  userId    String
+  quizId    String
+  score     Int
+  maxScore  Int
+  answers   Json     // { questionId: selectedAnswer }
+  timeTaken Int      // seconds
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+model StudyPlan {
+  id        String     @id @default(cuid())
+  userId    String
+  planData  Json       // structured daily/weekly plan
+  startDate DateTime
+  endDate   DateTime
+  status    PlanStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // STREAK, QUIZ_MASTER, COURSE_COMPLETE, etc.
+  title       String
+  description String
+  icon        String?
+  earnedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ChatSession {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  courseContext  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // "user" or "assistant"
+  content   String
+  createdAt DateTime @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+model WeakArea {
+  id           String   @id @default(cuid())
+  userId       String
+  topic        String
+  accuracy     Float    // 0-100
+  attempts     Int      @default(0)
+  lastTestedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topic])
+  @@index([userId])
+}

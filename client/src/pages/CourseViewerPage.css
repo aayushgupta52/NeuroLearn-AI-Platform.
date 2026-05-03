@@ -1,0 +1,312 @@
+.viewer-page {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0;
+  min-height: calc(100vh - var(--topbar-height));
+  margin: calc(-1 * 28px) calc(-1 * 32px);
+}
+
+.viewer-sidebar {
+  order: 2;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--topbar-height));
+  position: sticky;
+  top: var(--topbar-height);
+}
+
+.viewer-sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewer-sidebar-header h3 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.viewer-modules {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.viewer-module {
+  margin-bottom: 4px;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.module-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.module-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lesson-item:hover { background: var(--bg-secondary); }
+
+.lesson-item.active {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  font-weight: 600;
+  border-left: 3px solid var(--primary-600);
+}
+
+[data-theme="dark"] .lesson-item.active {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary-400);
+}
+
+.lesson-item.completed { color: var(--text-tertiary); }
+
+.lesson-check { color: var(--accent-green); flex-shrink: 0; }
+.lesson-play { color: var(--primary-600); flex-shrink: 0; }
+.lesson-circle { color: var(--text-tertiary); flex-shrink: 0; }
+
+.viewer-ai-cta {
+  padding: 16px;
+  margin: 12px;
+  background: linear-gradient(135deg, #1a0a3e, #2d1b69);
+  border-radius: var(--radius-md);
+}
+
+.viewer-ai-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-300);
+  margin-bottom: 8px;
+}
+
+/* Content */
+.viewer-content {
+  order: 1;
+  padding: 28px 48px;
+  max-width: 900px;
+  overflow-y: auto;
+}
+
+.viewer-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.lesson-content h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.lesson-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.lesson-body h1, .lesson-body h2, .lesson-body h3 {
+  color: var(--text-primary);
+  margin: 28px 0 12px;
+}
+
+.lesson-body h2 { font-size: 1.4rem; font-weight: 700; }
+.lesson-body h3 { font-size: 1.15rem; font-weight: 700; }
+
+.lesson-body code {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'Fira Code', monospace;
+}
+
+[data-theme="dark"] .lesson-body code {
+  background: rgba(139,92,246,0.12);
+  color: var(--primary-300);
+}
+
+.lesson-body pre {
+  background: #1e1e2e;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.lesson-body pre code {
+  background: none;
+  color: #e2e8f0;
+  padding: 0;
+}
+
+.lesson-body blockquote {
+  border-left: 3px solid var(--primary-400);
+  padding: 12px 20px;
+  background: var(--primary-50);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 20px 0;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .lesson-body blockquote {
+  background: rgba(139,92,246,0.06);
+}
+
+.lesson-body li {
+  margin-bottom: 6px;
+  list-style: none;
+  padding-left: 16px;
+  position: relative;
+}
+
+.lesson-body li::before {
+  content: '•';
+  color: var(--primary-500);
+  position: absolute;
+  left: 0;
+}
+
+.lesson-body strong { color: var(--text-primary); }
+
+/* Navigation */
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  margin-top: 40px;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 1024px) {
+  .viewer-page { grid-template-columns: 1fr; }
+  .viewer-sidebar { display: none; }
+  .viewer-content { padding: 20px 16px; }
+  .viewer-page { margin: 0; }
+}
+
+/* Video Embeds */
+.video-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.video-player-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.video-player-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-notes {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.video-notes h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+/* Recommended Videos */
+.recommended-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.recommendation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-500);
+}
+
+.recommendation-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.spin-animation {
+  animation: spin 2s linear infinite;
+}
